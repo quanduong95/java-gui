@@ -7,6 +7,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
+import java.awt.*;
+
 /**
  * A simple program where the user can sketch curves in a variety of
  * colors.  A color palette is shown along the right edge of the canvas.
@@ -15,7 +17,11 @@ import javafx.scene.paint.Color;
  * can click to clear the sketch.  The user draws by clicking and
  * dragging in a large white area that occupies most of the canvas.
  */
-public class SimplePaint extends Application {
+public class SimplePaint<options> extends Application {
+
+    private static final int COLORS = 7;
+    private static final int W_CELL = 56;
+    private static final int OPTIONS = 8;
 
     /**
      * This main routine allows this class to be run as a program.
@@ -36,9 +42,11 @@ public class SimplePaint extends Application {
             Color.BLACK, Color.RED, Color.GREEN, Color.BLUE,
             Color.CYAN, Color.MAGENTA, Color.color(0.95,0.9,0)
     };
+    private final String[]  options = {"2px","3px","4px","5px","line","rect","circle","ovalRect"};
 
     private int currentColorNum = 0;  // The currently selected drawing color,
                                       //   coded as an index into the above array
+    private int currentOptionNum = 0;
 
     private double prevX, prevY;   // The previous location of the mouse, when
                                    // the user is drawing by dragging the mouse.
@@ -50,6 +58,7 @@ public class SimplePaint extends Application {
     private GraphicsContext g;  // For drawing on the canvas.
 
 
+
     /**
      * The start() method creates the GUI, sets up event listening, and
      * shows the window on the screen.
@@ -58,30 +67,31 @@ public class SimplePaint extends Application {
         
         /* Create the canvans and draw its content for the first time. */
         
-        canvas = new Canvas(600,400);
+        canvas = new Canvas(800,400);
         g = canvas.getGraphicsContext2D();
         clearAndDrawPalette();
         
-        /* Respond to mouse events on the canvas, by calling methods in this class. */
+        /* Respond to mouse events on the canvas, by calling methods in this
+        class. */
         
         canvas.setOnMousePressed( e -> mousePressed(e) );
         canvas.setOnMouseDragged( e -> mouseDragged(e) );
         canvas.setOnMouseReleased( e -> mouseReleased(e) );
         
         /* Configure the GUI and show the window. */
-        
         Pane root = new Pane(canvas);
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setResizable(false);
-        stage.setTitle("Simple Paint");
+        stage.setTitle("Simple Paint Program");
         stage.show();
     }
 
 
     /**
      * Fills the canvas with white and draws the color palette and (simulated)
-     * "Clear" button on the right edge of the canvas.  This method is called when
+     * "Clear" button on the right edge of the canvas.  This method is called
+     * when
      * the canvas is created and when the user clicks "Clear."
      */
     public void clearAndDrawPalette() {
@@ -92,7 +102,8 @@ public class SimplePaint extends Application {
         g.setFill(Color.WHITE);
         g.fillRect(0,0,width,height);
 
-        int colorSpacing = (height - 56) / 7;
+        int colorSpacing = (height - W_CELL) / COLORS;
+        int optionSpacing = (height - W_CELL) / OPTIONS;
         // Distance between the top of one colored rectangle in the palette
         // and the top of the rectangle below it.  The height of the
         // rectangle will be colorSpacing - 3.  There are 7 colored rectangles,
@@ -101,39 +112,90 @@ public class SimplePaint extends Application {
 
         /* Draw a 3-pixel border around the canvas in gray.  This has to be
              done by drawing three rectangles of different sizes. */
-
         g.setStroke(Color.GRAY);
         g.setLineWidth(3);
         g.strokeRect(1.5, 1.5, width-3, height-3);
 
-        /* Draw a 56-pixel wide gray rectangle along the right edge of the canvas.
+        /* Draw a 56-pixel wide gray rectangle along the right edge of the
+        canvas.
              The color palette and Clear button will be drawn on top of this.
              (This covers some of the same area as the border I just drew. */
 
         g.setFill(Color.GRAY);
-        g.fillRect(width - 56, 0, 56, height);
+        g.fillRect(width - W_CELL, 0, W_CELL, height);
 
-        /* Draw the "Clear button" as a 50-by-50 white rectangle in the lower right
+        /* Draw the "Clear button" as a 50-by-50 white rectangle in the lower
+        right
              corner of the canvas, allowing for a 3-pixel border. */
 
         g.setFill(Color.WHITE);
         g.fillRect(width-53,  height-53, 50, 50);
         g.setFill(Color.BLACK);
-        g.fillText("CLEAR", width-48, height-23); 
+        g.fillText("CLEAR", width-48, height-23);
+
+
 
         /* Draw the seven color rectangles. */
-        
+
         for (int N = 0; N < 7; N++) {
             g.setFill( palette[N] );
-            g.fillRect(width-53, 3 + N*colorSpacing, 50, colorSpacing-3);
+            g.fillRect(width-53, 3 + N*colorSpacing, 50,
+                    colorSpacing-3);
         }
+
+        g.setFill(Color.GRAY);
+        g.fillRect(width - W_CELL*2+3, 0, W_CELL, height);
+
+
+        //draw the inner bar for shapes
+        for(int n = 0; n < 7; n++){
+            g.setFill(Color.WHITE);
+            g.fillRect(width-53*2,3+n*colorSpacing,50,colorSpacing-3);
+        }
+
+
+        g.setFill(Color.BLACK);
+        g.fillOval(width-51*2,  height-48*2-3, 40, 40);
+
+
+        g.setFill(Color.BLACK);
+        g.fillRect(width-51*2,height-48*3-3,40,35);
+
+
+        g.setStroke(Color.BLACK);
+        g.strokeLine(width-53*2+10,3+4*colorSpacing+10,width-65,3+5*colorSpacing-7 );
+
+
+        g.setFill(Color.BLACK);
+        g.fillOval(width-53*2+20,3+3*colorSpacing+22,12,12);
+
+
+        g.setFill(Color.BLACK);
+        g.fillOval(width-53*2+22,3+2*colorSpacing+22,9,9);
+
+
+        g.setFill(Color.BLACK);
+        g.fillOval(width-53*2+24,3+colorSpacing+22,6,6);
+
+
+        g.setFill(Color.BLACK);
+        g.fillOval(width-53*2+26,3+25,3,3);
+
+
+        g.setFill(Color.WHITE);
+        g.fillRect(width-53*2,  height-53, 50, 50);
+        g.setFill(Color.BLACK);
+        g.fillRoundRect(width-51*2,  height-48, 40, 40,15,15);
+
+
 
         /* Draw a 2-pixel white border around the color rectangle
              of the current drawing color. */
 
         g.setStroke(Color.WHITE);
         g.setLineWidth(2);
-        g.strokeRect(width-54, 2 + currentColorNum*colorSpacing, 52, colorSpacing-1);
+        g.strokeRect(width-54, 2 + currentColorNum*colorSpacing, 52,
+                colorSpacing-1);
 
     } // end clearAndDrawPalette()
 
@@ -142,30 +204,58 @@ public class SimplePaint extends Application {
      * Change the drawing color after the user has clicked the
      * mouse on the color palette at a point with y-coordinate y.
      */
+
+
     private void changeColor(int y) {
 
         int width = (int)canvas.getWidth(); 
         int height = (int)canvas.getHeight(); 
-        int colorSpacing = (height - 56) / 7;  // Space for one color rectangle.
-        int newColor = y / colorSpacing;       // Which color number was clicked?
+        int colorSpacing = (height - W_CELL) / COLORS;  // Space for one color rectangle.
+        int newColor = y / colorSpacing;       // Which color number was
+        // clicked?
 
-        if (newColor < 0 || newColor > 6)      // Make sure the color number is valid.
+        if (newColor < 0 || newColor > 6)      // Make sure the color number
+            // is valid.
             return;
 
-        /* Remove the highlight from the current color, by drawing over it in gray.
-             Then change the current drawing color and draw a highlight around the
+        /* Remove the highlight from the current color, by drawing over it
+        in gray.
+             Then change the current drawing color and draw a highlight
+             around the
              new drawing color.  */
         
         g.setLineWidth(2);
         g.setStroke(Color.GRAY);
-        g.strokeRect(width-54, 2 + currentColorNum*colorSpacing, 52, colorSpacing-1);
+        //change the old selected one to gray again
+        g.strokeRect(width-54, 2 + currentColorNum*colorSpacing, 52,
+                colorSpacing-1);
         currentColorNum = newColor;
+        //change the new selected one to white
         g.setStroke(Color.WHITE);
-        g.strokeRect(width-54, 2 + currentColorNum*colorSpacing, 52, colorSpacing-1);
+        g.strokeRect(width-54, 2 + currentColorNum*colorSpacing, 52,
+                colorSpacing-1);
 
     } // end changeColor()
 
+    private void changeOption(int y){
+        int width = (int)canvas.getWidth();
+        int height = (int)canvas.getHeight();
+        int optionSpacing = (height - W_CELL) / (OPTIONS-1);  // Space for one color rectangle.
+        int newOption = y / optionSpacing;       // Which option number was
+        // clicked?
 
+        if (newOption < 0 || newOption > 7 )      // Make sure the color number
+            // is valid.
+            return;
+        g.setLineWidth(2);
+        g.setStroke(Color.GRAY);
+        g.strokeRect(width-54*2, 2 + currentOptionNum*optionSpacing, 52,
+                optionSpacing-1);
+        currentOptionNum = newOption;
+        g.setStroke(Color.WHITE);
+        g.strokeRect(width-54*2 , 2 + currentOptionNum*optionSpacing, 52,
+                optionSpacing-1);
+    }
 
     /**
      * This is called when the user presses the mouse anywhere in the canvas.  
@@ -175,7 +265,7 @@ public class SimplePaint extends Application {
      */
     public void mousePressed(MouseEvent evt) {
 
-        if (dragging == true)  // Ignore mouse presses that occur
+        if (dragging)  // Ignore mouse presses that occur
             return;            //    when user is already drawing a curve.
                                //    (This can happen if the user presses
                                //    two mouse buttons at the same time.)
@@ -195,7 +285,9 @@ public class SimplePaint extends Application {
             else
                 changeColor(y);  // Clicked on the color palette.
         }
-        else if (x > 3 && x < width - 56 && y > 3 && y < height - 3) {
+        else if (x > width -53*2) {
+            changeOption(y);
+        } else if (x > 3 && x < width - W_CELL && y > 3 && y < height - 3) {
             // The user has clicked on the white drawing area.
             // Start drawing a curve from the point (x,y).
             prevX = x;
@@ -218,16 +310,21 @@ public class SimplePaint extends Application {
 
 
     /**
-     * Called whenever the user moves the mouse while a mouse button is held down.  
-     * If the user is drawing, draw a line segment from the previous mouse location 
-     * to the current mouse location, and set up prevX and prevY for the next call.  
-     * Note that in case the user drags outside of the drawing area, the values of
-     * x and y are "clamped" to lie within this area.  This avoids drawing on the color 
+     * Called whenever the user moves the mouse while a mouse button is
+     * held down.
+     * If the user is drawing, draw a line segment from the previous mouse
+     * location
+     * to the current mouse location, and set up prevX and prevY for the next
+     * call.
+     * Note that in case the user drags outside of the drawing area,
+     * the values of
+     * x and y are "clamped" to lie within this area.  This avoids drawing
+     * on the color
      * palette or clear button.
      */
     public void mouseDragged(MouseEvent evt) {
 
-        if (dragging == false)
+        if (!dragging)
             return;  // Nothing to do because the user isn't drawing.
 
         double x = evt.getX();   // x-coordinate of mouse.
