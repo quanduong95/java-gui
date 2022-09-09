@@ -42,7 +42,6 @@ public class SimplePaint<options> extends Application {
             Color.BLACK, Color.RED, Color.GREEN, Color.BLUE,
             Color.CYAN, Color.MAGENTA, Color.color(0.95,0.9,0)
     };
-    private final String[]  options = {"2px","3px","4px","5px","line","rect","circle","ovalRect"};
 
     private int currentColorNum = 0;  // The currently selected drawing color,
                                       //   coded as an index into the above array
@@ -65,7 +64,7 @@ public class SimplePaint<options> extends Application {
      */
     public void start(Stage stage) {
         
-        /* Create the canvans and draw its content for the first time. */
+        /* Create the canvas and draw its content for the first time. */
         
         canvas = new Canvas(800,400);
         g = canvas.getGraphicsContext2D();
@@ -74,9 +73,9 @@ public class SimplePaint<options> extends Application {
         /* Respond to mouse events on the canvas, by calling methods in this
         class. */
         
-        canvas.setOnMousePressed( e -> mousePressed(e) );
-        canvas.setOnMouseDragged( e -> mouseDragged(e) );
-        canvas.setOnMouseReleased( e -> mouseReleased(e) );
+        canvas.setOnMousePressed(this::mousePressed);
+        canvas.setOnMouseDragged(this::mouseDragged);
+        canvas.setOnMouseReleased(this::mouseReleased);
         
         /* Configure the GUI and show the window. */
         Pane root = new Pane(canvas);
@@ -163,7 +162,8 @@ public class SimplePaint<options> extends Application {
 
 
         g.setStroke(Color.BLACK);
-        g.strokeLine(width-53*2+10,3+4*colorSpacing+10,width-65,3+5*colorSpacing-7 );
+        g.strokeLine(width-53*2+10,3+4*colorSpacing+10,width-65,
+                3+5*colorSpacing-7 );
 
 
         g.setFill(Color.BLACK);
@@ -185,7 +185,8 @@ public class SimplePaint<options> extends Application {
         g.setFill(Color.WHITE);
         g.fillRect(width-53*2,  height-53, 50, 50);
         g.setFill(Color.BLACK);
-        g.fillRoundRect(width-51*2,  height-48, 40, 40,15,15);
+        g.fillRoundRect(width-51*2,  height-48, 40, 40,15,
+                15);
 
 
 
@@ -210,7 +211,8 @@ public class SimplePaint<options> extends Application {
 
         int width = (int)canvas.getWidth(); 
         int height = (int)canvas.getHeight(); 
-        int colorSpacing = (height - W_CELL) / COLORS;  // Space for one color rectangle.
+        int colorSpacing = (height - W_CELL) / COLORS;  // Space for one color
+        // rectangle.
         int newColor = y / colorSpacing;       // Which color number was
         // clicked?
 
@@ -240,7 +242,8 @@ public class SimplePaint<options> extends Application {
     private void changeOption(int y){
         int width = (int)canvas.getWidth();
         int height = (int)canvas.getHeight();
-        int optionSpacing = (height - W_CELL) / (OPTIONS-1);  // Space for one color rectangle.
+        int optionSpacing = (height - W_CELL) / (OPTIONS-1);  // Space for one
+        // color rectangle.
         int newOption = y / optionSpacing;       // Which option number was
         // clicked?
 
@@ -290,11 +293,60 @@ public class SimplePaint<options> extends Application {
         } else if (x > 3 && x < width - W_CELL && y > 3 && y < height - 3) {
             // The user has clicked on the white drawing area.
             // Start drawing a curve from the point (x,y).
-            prevX = x;
-            prevY = y;
-            dragging = true;
-            g.setLineWidth(2);  // Use a 2-pixel-wide line for drawing.
-            g.setStroke( palette[currentColorNum] );
+            if(currentOptionNum == 0) {
+                prevX = x;
+                prevY = y;
+                dragging = true;
+                g.setLineWidth(1);
+                g.setStroke( palette[currentColorNum] );
+            } else if(currentOptionNum == 1) {
+                prevX = x;
+                prevY = y;
+                dragging = true;
+                g.setLineWidth(3);
+                g.setStroke( palette[currentColorNum] );
+            } else if(currentOptionNum == 2) {
+                prevX = x;
+                prevY = y;
+                dragging = true;
+                g.setLineWidth(5);
+                g.setStroke( palette[currentColorNum] );
+            } else if(currentOptionNum == 3) {
+                prevX = x;
+                prevY = y;
+                dragging = true;
+                g.setLineWidth(7);
+                g.setStroke(palette[currentColorNum]);
+            } else if (currentOptionNum == 4 ) {
+                prevX = x;
+                prevY = y;
+                dragging = true;
+                g.setLineWidth(2);
+                g.setStroke(palette[currentColorNum]);
+            } else if (currentOptionNum == 5) {
+                prevX = x;
+                prevY = y;
+                dragging = true;
+                g.setLineWidth(2);
+                g.setStroke(palette[currentColorNum]);
+            } else if (currentOptionNum == 6) {
+                prevX = x;
+                prevY = y;
+                dragging = true;
+                g.setLineWidth(2);
+                g.setStroke(palette[currentColorNum]);
+            } else if (currentOptionNum == 7) {
+                prevX = x;
+                prevY = y;
+                dragging = true;
+                g.setLineWidth(2);
+                g.setStroke(palette[currentColorNum]);
+            //default case
+            } else  {
+                return;
+            }
+
+
         }
 
     } // end mousePressed()
@@ -339,11 +391,30 @@ public class SimplePaint<options> extends Application {
             y = 3;                           //   to make sure it's in
         if (y > canvas.getHeight() - 4)       //   the drawing area.
             y = canvas.getHeight() - 4;
+        if(     currentOptionNum == 0 ||
+                currentOptionNum == 1 || currentOptionNum == 2 ||
+                currentOptionNum == 3 || currentOptionNum == 4)
+        {
+            g.strokeLine(prevX, prevY, x, y);  // Draw the line.
+            if(currentOptionNum == 4) {
+                return;
+            }
+            prevX = x;  // Get ready for the next line segment in the curve.
+            prevY = y;
+        } else if (currentOptionNum == 5) {
+            g.setFill( palette[currentColorNum] );
+            g.fillRect(-x+2*prevX,-y+2*prevY ,(x-prevX)*2,(y-prevY)*2
+                    );
+        } else if (currentOptionNum == 6) {
+            g.setFill( palette[currentColorNum] );
+            g.fillOval(-x+2*prevX,-y+2*prevY ,(x-prevX)*2,(y-prevY)*2);
+        } else if (currentOptionNum == 7) {
+            g.setFill( palette[currentColorNum] );
+            g.fillRoundRect(-x+2*prevX,-y+2*prevY ,(x-prevX)*2,(y-prevY)*2,50,50);
+        } else {
+            return;
+        }
 
-        g.strokeLine(prevX, prevY, x, y);  // Draw the line.
-
-        prevX = x;  // Get ready for the next line segment in the curve.
-        prevY = y;
 
     } // end mouseDragged()
 
