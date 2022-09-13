@@ -17,7 +17,7 @@ import java.awt.*;
  * can click to clear the sketch.  The user draws by clicking and
  * dragging in a large white area that occupies most of the canvas.
  */
-public class SimplePaint<options> extends Application {
+public class SimpleToolPaint<options> extends Application {
 
     private static final int COLORS = 7;
     private static final int W_CELL = 56;
@@ -149,7 +149,8 @@ public class SimplePaint<options> extends Application {
         //draw the inner bar for shapes
         for(int n = 0; n < 7; n++){
             g.setFill(Color.WHITE);
-            g.fillRect(width-53*2,3+n*colorSpacing,50,colorSpacing-3);
+            g.fillRect(width-53*2,3+n*colorSpacing,50,
+                    colorSpacing-3);
         }
 
 
@@ -252,12 +253,12 @@ public class SimplePaint<options> extends Application {
             return;
         g.setLineWidth(2);
         g.setStroke(Color.GRAY);
-        g.strokeRect(width-54*2, 2 + currentOptionNum*optionSpacing, 52,
+        g.strokeRect(width-54*2, 2 + currentOptionNum*optionSpacing,52,
                 optionSpacing-1);
         currentOptionNum = newOption;
         g.setStroke(Color.WHITE);
-        g.strokeRect(width-54*2 , 2 + currentOptionNum*optionSpacing, 52,
-                optionSpacing-1);
+        g.strokeRect(width-54*2 , 2 + currentOptionNum*optionSpacing,
+                52, optionSpacing-1);
     }
 
     /**
@@ -297,25 +298,25 @@ public class SimplePaint<options> extends Application {
                 prevX = x;
                 prevY = y;
                 dragging = true;
-                g.setLineWidth(1);
+                g.setLineWidth(2);
                 g.setStroke( palette[currentColorNum] );
             } else if(currentOptionNum == 1) {
                 prevX = x;
                 prevY = y;
                 dragging = true;
-                g.setLineWidth(3);
+                g.setLineWidth(4);
                 g.setStroke( palette[currentColorNum] );
             } else if(currentOptionNum == 2) {
                 prevX = x;
                 prevY = y;
                 dragging = true;
-                g.setLineWidth(5);
+                g.setLineWidth(6);
                 g.setStroke( palette[currentColorNum] );
             } else if(currentOptionNum == 3) {
                 prevX = x;
                 prevY = y;
                 dragging = true;
-                g.setLineWidth(7);
+                g.setLineWidth(8);
                 g.setStroke(palette[currentColorNum]);
             } else if (currentOptionNum == 4 ) {
                 prevX = x;
@@ -384,8 +385,8 @@ public class SimplePaint<options> extends Application {
 
         if (x < 3)                          // Adjust the value of x,
             x = 3;                           //   to make sure it's in
-        if (x > canvas.getWidth() - 57)       //   the drawing area.
-            x = (int)canvas.getWidth() - 57;
+        if (x > canvas.getWidth() - 56*2)       //   the drawing area.
+            x = (int)canvas.getWidth() - 56*2;
 
         if (y < 3)                          // Adjust the value of y,
             y = 3;                           //   to make sure it's in
@@ -403,14 +404,16 @@ public class SimplePaint<options> extends Application {
             prevY = y;
         } else if (currentOptionNum == 5) {
             g.setFill( palette[currentColorNum] );
-            g.fillRect(-x+2*prevX,-y+2*prevY ,(x-prevX)*2,(y-prevY)*2
-                    );
+            g.fillRect(-x+2*prevX,-y+2*prevY ,(x-prevX)*2,
+                    (y-prevY)*2);
         } else if (currentOptionNum == 6) {
             g.setFill( palette[currentColorNum] );
-            g.fillOval(-x+2*prevX,-y+2*prevY ,(x-prevX)*2,(y-prevY)*2);
+            g.fillOval(-x+2*prevX,-y+2*prevY ,(x-prevX)*2,
+                    (y-prevY)*2);
         } else if (currentOptionNum == 7) {
             g.setFill( palette[currentColorNum] );
-            g.fillRoundRect(-x+2*prevX,-y+2*prevY ,(x-prevX)*2,(y-prevY)*2,50,50);
+            g.fillRoundRect(-x+2*prevX,-y+2*prevY ,(x-prevX)*2,
+                    (y-prevY)*2,50,50);
         } else {
             return;
         }
