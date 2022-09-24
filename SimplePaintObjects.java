@@ -20,6 +20,9 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.scene.paint.Color;
 
+import java.awt.*;
+import java.util.ArrayList;
+
 interface ShapeObject {
 
     void draw(GraphicsContext g);
@@ -55,7 +58,7 @@ class LineShape implements ShapeObject {
 
     @Override
     public void draw(GraphicsContext g) {
-
+        g.strokeLine(start.getX(), start.getY(), end.getX(), end.getY());
     }
 
     @Override
@@ -312,6 +315,7 @@ public class SimplePaintObjects<primaryStage> extends Application {
     private PointTool currentPointTool;
     private ShapeTool currentShapeTool;
     private String nameOfCurrentShapeTool;
+    private ArrayList<ShapeTool> listOfShapes;
     private double currentPenWidth;
     private GraphicsContext g;  // For drawing on the canvas.
     static final Color TOOL_RECT_FG = Color.LIGHTCORAL;
@@ -388,6 +392,8 @@ public class SimplePaintObjects<primaryStage> extends Application {
                 this.currentColorTool.deactivate();
             }
             this.currentColorTool = tool;
+            g.setLineWidth(2);
+            g.setStroke(this.currentColorTool.getColor());
             tool.activate();
         });
         return tool;
@@ -443,15 +449,19 @@ public class SimplePaintObjects<primaryStage> extends Application {
         shapeTool.setOnMousePressed((e)->{
             if(this.currentShapeTool != null){
                 this.currentShapeTool.deactivate();
-                this.currentPenWidth = 2;
             }
             if(this.currentPointTool != null){
                 this.currentPointTool.deactivate();
-                this.currentShapeTool = null;
             }
             this.nameOfCurrentShapeTool = toolName;
             this.currentShapeTool = shapeTool;
+            this.currentPenWidth = 2;
+            if(this.currentColorTool != null){
+                g.setLineWidth(2);
+                g.setStroke(this.currentColorTool.getColor());
+            }
             shapeTool.activate();
+
         });
         return shapeTool;
     }
@@ -515,22 +525,15 @@ public class SimplePaintObjects<primaryStage> extends Application {
             return;  // Nothing to do because the user isn't drawing.
         double x = e.getX();   // x-coordinate of mouse.
         double y = e.getY();
-        if (x < 5)                          // Adjust the value of x,
-            x = 4;
-        if (x > WIDTH)       //   the drawing area.
-            x = WIDTH-4;
-        if (y < 5)                          // Adjust the value of y,
-            y = 4;                           //   to make sure it's in
-        if (y > HEIGHT)       //   the drawing area.
-            y = HEIGHT-4;
-        g.setStroke( currentColorTool.getColor());
-        if(nameOfCurrentShapeTool.equalsIgnoreCase("LINE")) {
-            return;
-        } else {
-            g.strokeLine(prevX, prevY, x, y);
-            prevX = x;  // Get ready for the next line segment in the curve.
+        Point2D start = new Point2D(prevX,prevY);
+        Point2D end = new Point2D(x,y);
+
+        currentShapeTool.draw(g,currentColorTool.getColor(), start,end);
+        if(!nameOfCurrentShapeTool.equals("LINE")) {
+            prevX = x;
             prevY = y;
         }
+
 
     }
 
