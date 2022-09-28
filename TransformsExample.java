@@ -6,6 +6,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+
 /*
  * PongApp extends Application{}
  *
@@ -46,13 +47,13 @@ class Model extends Group{
     }
 }
 
-class TransformsExample extends Application{
+public class TransformsExample<primaryStage> extends Application{
     @Override
     public void start(Stage primaryStage) throws Exception{
         Model root = new Model();
         Scene scene = new Scene(root, 400, 400);
         primaryStage.setScene(scene);
-        scene.setOnMouseMoved(root::handleMouseMove);
+        scene.setOnMouseMoved(e -> root.handleMouseMove(e));
         primaryStage.show();
     }
 }
