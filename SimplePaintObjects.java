@@ -47,6 +47,7 @@ class LineSegmentShape implements ShapeObject {
 
     @Override
     public void draw(GraphicsContext g) {
+        g.setFill(this.color);
         g.strokeLine(start.getX(), start.getY(), end.getX(), end.getY());
     }
 
@@ -70,6 +71,7 @@ class LineShape implements ShapeObject {
 
     @Override
     public void draw(GraphicsContext g) {
+        g.setFill( this.color);
         g.strokeLine(start.getX(), start.getY(), end.getX(), end.getY());
     }
 
@@ -627,7 +629,13 @@ public class SimplePaintObjects<primaryStage> extends Application {
                 exception.printStackTrace();
             }
         });
-        canvas.setOnMouseReleased(this::mouseReleased);
+        canvas.setOnMouseReleased(e -> {
+            try {
+                mouseReleased(e);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        });
         return canvas;
     }
 
@@ -656,33 +664,35 @@ public class SimplePaintObjects<primaryStage> extends Application {
     }
 
     private void mouseDragged(MouseEvent e) throws Exception {
-        clearCanvas();
         if (!dragging)
             return;  // Nothing to do because the user isn't drawing.
         double x = e.getX();   // x-coordinate of mouse.
         double y = e.getY();
         Point2D start = new Point2D(prevX,prevY);
         Point2D end = new Point2D(x,y);
+        if(!nameOfCurrentShapeTool.equalsIgnoreCase("POINT")){
+            clearCanvas();
+        }
+        currentShapeTool.draw(g, currentColorTool.getColor(), start, end);
+        if (currentShapeTool.getPaintShape().dragUpdate()) {
+            shapes.add(currentShapeTool.getPaintShape());
+            prevX = x;
+            prevY = y;
+        }
 
         for(ShapeObject shape : shapes) {
             shape.draw(g);
         }
 
-        currentShapeTool.draw(g, currentColorTool.getColor(), start, end);
-        if (currentShapeTool.getPaintShape().dragUpdate()) {
-            prevX = x;
-            prevY = y;
-        }
     }
 
-    private void mouseReleased(MouseEvent e) {
+    private void mouseReleased(MouseEvent e) throws Exception {
         dragging = false;
         double x = e.getX();   // x-coordinate of mouse.
         double y = e.getY();
         Point2D start = new Point2D(prevX,prevY);
         Point2D end = new Point2D(x,y);
-        if(nameOfCurrentShapeTool.equalsIgnoreCase("POINT"))
-            return;
+
         currentShapeTool.draw(g,currentColorTool.getColor(),start,end);
         shapes.add(currentShapeTool.getPaintShape());
     }
